@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2-Player Chess</title>
+<style>
+  body { display:flex; justify-content:center; align-items:center; height:100vh; background:#0f172a; color:white; font-family:sans-serif; }
+  table { border-collapse: collapse; }
+  td { width:60px; height:60px; text-align:center; vertical-align:middle; font-size:36px; cursor:pointer; }
+  .white { background:#f0d9b5; }
+  .black { background:#b58863; }
+  .selected { outline: 3px solid #22d3ee; }
+</style>
+</head>
+<body>
+<table id="chessboard"></table>
+<script>
+const board = document.getElementById('chessboard');
+const pieces = {'r':'♜','n':'♞','b':'♝','q':'♛','k':'♚','p':'♟','R':'♖','N':'♘','B':'♗','Q':'♕','K':'♔','P':'♙'};
+let boardState = [
+  ['r','n','b','q','k','b','n','r'],
+  ['p','p','p','p','p','p','p','p'],
+  ['','','','','','','',''],
+  ['','','','','','','',''],
+  ['','','','','','','',''],
+  ['','','','','','','',''],
+  ['P','P','P','P','P','P','P','P'],
+  ['R','N','B','Q','K','B','N','R']
+];
+let turn = 'white';
+let selected = null;
+function drawBoard(){
+  board.innerHTML = '';
+  for(let i=0;i<8;i++){
+    const row = board.insertRow();
+    for(let j=0;j<8;j++){
+      const cell = row.insertCell();
+      cell.className = (i+j)%2===0 ? 'white':'black';
+      cell.textContent = pieces[boardState[i][j]] || '';
+      cell.dataset.row = i;
+      cell.dataset.col = j;
+      cell.addEventListener('click',cellClick);
+    }
+  }
+}
+function cellClick(){
+  const r = parseInt(this.dataset.row);
+  const c = parseInt(this.dataset.col);
+  if(selected){
+    if(boardState[selected.row][selected.col] && isValidMove(selected.row, selected.col, r, c)){
+      boardState[r][c] = boardState[selected.row][selected.col];
+      boardState[selected.row][selected.col] = '';
+      turn = turn==='white'?'black':'white';
+    }
+    selected = null;
+    drawBoard();
+  } else {
+    if(boardState[r][c] && ((turn==='white' && boardState[r][c]===boardState[r][c].toUpperCase()) || 
+                            (turn==='black' && boardState[r][c]===boardState[r][c].toLowerCase()))){
+      selected = {row:r,col:c};
+      drawBoard();
+      this.classList.add('selected');
+    }
+  }
+}
+function isValidMove(sr, sc, dr, dc){ return true; }
+drawBoard();
+</script>
+</body>
+</html>
